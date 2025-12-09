@@ -1,0 +1,163 @@
+
+import pandas as pd
+df = pd.read_csv('titanic.csv')
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 12 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   PassengerId  891 non-null    int64  
+ 1   Survived     891 non-null    int64  
+ 2   Pclass       891 non-null    int64  
+ 3   Name         891 non-null    object 
+ 4   Sex          891 non-null    object 
+ 5   Age          714 non-null    float64
+ 6   SibSp        891 non-null    int64  
+ 7   Parch        891 non-null    int64  
+ 8   Ticket       891 non-null    object 
+ 9   Fare         891 non-null    float64
+ 10  Cabin        204 non-null    object 
+ 11  Embarked     889 non-null    object 
+dtypes: float64(2), int64(5), object(5)
+memory usage: 83.7+ KB
+mean_ages = df.groupby('Pclass')['Age'].mean()
+age1 = mean_ages[1] 
+age2 = mean_ages[2] 
+age3 = mean_ages[3]
+def conver_age(row):
+    if pd.isnull(row['Age']):
+        if row['Pclass'] == 1:
+            return age1
+        elif row['Pclass'] == 2:
+            return age2
+        elif row['Pclass'] == 3:
+            return age3
+    else:
+        return row['Age']
+df['Age'] = df.apply(conver_age, axis=1)
+df.head()
+PassengerId	Survived	Pclass	Name	Sex	Age	SibSp	Parch	Ticket	Fare	Cabin	Embarked
+0	1	0	3	Braund, Mr. Owen Harris	male	22.0	1	0	A/5 21171	7.2500	NaN	S
+1	2	1	1	Cumings, Mrs. John Bradley (Florence Briggs Th...	female	38.0	1	0	PC 17599	71.2833	C85	C
+2	3	1	3	Heikkinen, Miss. Laina	female	26.0	0	0	STON/O2. 3101282	7.9250	NaN	S
+3	4	1	1	Futrelle, Mrs. Jacques Heath (Lily May Peel)	female	35.0	1	0	113803	53.1000	C123	S
+4	5	0	3	Allen, Mr. William Henry	male	35.0	0	0	373450	8.0500	NaN	S
+df['Sex'].value_counts()
+Sex
+male      577
+female    314
+Name: count, dtype: int64
+def conver_sex(value):
+    if value == 'male':
+        return 1
+    else:
+        return 0
+
+df['Sex'] = df['Sex'].apply(conver_sex)
+df['Sex'].value_counts()
+Sex
+1    577
+0    314
+Name: count, dtype: int64
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 12 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   PassengerId  891 non-null    int64  
+ 1   Survived     891 non-null    int64  
+ 2   Pclass       891 non-null    int64  
+ 3   Name         891 non-null    object 
+ 4   Sex          891 non-null    int64  
+ 5   Age          891 non-null    float64
+ 6   SibSp        891 non-null    int64  
+ 7   Parch        891 non-null    int64  
+ 8   Ticket       891 non-null    object 
+ 9   Fare         891 non-null    float64
+ 10  Cabin        204 non-null    object 
+ 11  Embarked     889 non-null    object 
+dtypes: float64(2), int64(6), object(4)
+memory usage: 83.7+ KB
+df.drop(['Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1, inplace=True)
+df['Alone'] = df['SibSp'] + df['Parch']
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 9 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   PassengerId  891 non-null    int64  
+ 1   Survived     891 non-null    int64  
+ 2   Pclass       891 non-null    int64  
+ 3   Name         891 non-null    object 
+ 4   Sex          891 non-null    int64  
+ 5   Age          891 non-null    float64
+ 6   SibSp        891 non-null    int64  
+ 7   Parch        891 non-null    int64  
+ 8   Alone        891 non-null    int64  
+dtypes: float64(1), int64(7), object(1)
+memory usage: 62.8+ KB
+df['Alone'].value_counts()
+Alone
+0     537
+1     161
+2     102
+3      29
+5      22
+4      15
+6      12
+10      7
+7       6
+Name: count, dtype: int64
+df['Alone'] = df['SibSp'] + df['Parch']
+def conver_alone(value):
+    if value != 0:
+        return 1
+    else:
+        return 0 
+
+df['Alone'] = df['Alone'].apply(conver_alone)
+df['Alone'].value_counts()
+Alone
+0    537
+1    354
+Name: count, dtype: int64
+df.head()
+PassengerId	Survived	Pclass	Name	Sex	Age	SibSp	Parch	Alone
+0	1	0	3	Braund, Mr. Owen Harris	1	22.0	1	0	1
+1	2	1	1	Cumings, Mrs. John Bradley (Florence Briggs Th...	0	38.0	1	0	1
+2	3	1	3	Heikkinen, Miss. Laina	0	26.0	0	0	0
+3	4	1	1	Futrelle, Mrs. Jacques Heath (Lily May Peel)	0	35.0	1	0	1
+4	5	0	3	Allen, Mr. William Henry	1	35.0	0	0	0
+df.drop(['SibSp', 'Parch'], axis=1, inplace=True)
+df.drop('Name', axis=1, inplace=True)
+df.head()
+PassengerId	Survived	Pclass	Sex	Age	Alone
+0	1	0	3	1	22.0	1
+1	2	1	1	0	38.0	1
+2	3	1	3	0	26.0	0
+3	4	1	1	0	35.0	1
+4	5	0	3	1	35.0	0
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+x = df.drop('Survived', axis=1)
+y = df['Survived']
+x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.25, random_state=42)
+sc = StandardScaler()
+x_train = sc.fit_transform(x_train)
+x_test = sc.transform(x_test)
+classifier = KNeighborsClassifier(n_neighbors=3)
+classifier.fit(x_train,y_train)
+KNeighborsClassifier(n_neighbors=3)
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+prediction = classifier.predict(x_test)
+print('Percentage:  ', accuracy_score(y_test, prediction) * 100)
+Percentage:   79.82062780269058
+print('Confusion matrix: ', confusion_matrix(y_test, prediction, labels=[0,1]))
+Confusion matrix:  [[115  19]
+ [ 26  63]]
